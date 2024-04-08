@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Register
+{% endblock %}
+
+{% block main %}
+    <style>
+        .center {
+            text-align: center;
+        }
+        ul {
+            display: inline-block;
+            text-align: left;
+        }
+        li {
+            font-size: 15px;
+        }
+        h2 {
+            padding-bottom: 48px;
+            margin: 0;
+        }
+
+    </style>
+
+    {% if get_flashed_messages() %}
+       <div class="alert alert-danger alert-dismissible fade show" id="alert-message" role="alert" style="width: 35%; margin-right: auto; margin-left: auto;">
+           {{ get_flashed_messages()[0] }}
+       </div>
+    {% endif %}
+
+
+    <h2>Register</h2>
+    <form action="" method="post">
+        <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="username" name="username" placeholder="Username" type="text">
+        <br>
+        <input class="form-control mx-auto w-auto" id="password" name="password" placeholder="Password" type="password">
+        <br>
+        <input class="form-control mx-auto w-auto" id="confirmation" name="confirmation" placeholder="Confirm Password" type="password">
+        <br>
+        <p><b>Note:</b> Password must contain:</p>
+        <div class="center">
+            <ul>
+                <li >At least 8 characters</li>
+                <li>At least one UPPER case letter</li>
+                <li>At least one LOWER case letter</li>
+                <li>At least one number</li>
+                <li>At least one special character</li>
+            </ul>
+        </div>
+        <button class="btn btn-primary" type="submit">Register</button>
+    </form>
+{% endblock %}

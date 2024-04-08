@@ -1,0 +1,241 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Grades
+{% endblock %}
+
+{% block main %}
+    <script>
+        function myFunction() {
+            setTimeout(hideAlert, 5000);
+        }
+        function hideAlert() {
+            const alert = bootstrap.Alert.getOrCreateInstance('#alert-message');
+            alert.close()
+        }
+    </script>
+    <style>
+        a {
+            color: #212529;
+        }
+        a:hover {
+            color: #00645A;
+        }
+        .grade:hover {
+            color: #00645A;
+            cursor: pointer;
+        }
+        h1 {
+            padding-bottom: 48px;
+            margin: 0;
+        }
+        form {
+            display: inline-block;
+        }
+        p {
+            display: table-row;
+        }
+        label {
+            display: table-cell;
+        }
+        button {
+            width: 90px;
+            margin: 4px
+        }
+        input {
+            width: 250px;
+            display: table-cell;
+            padding: 4px;
+            margin: 4px;
+        }
+    </style>
+    {% if get_flashed_messages() %}
+        <div class="alert alert-success alert-dismissible fade show" id="alert-message" role="alert" style="width: 35%; margin-right: auto; margin-left: auto;">
+            {{ get_flashed_messages()[0] }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endif %}
+
+    {% if classes %}
+        <h1>My Grades</h1>
+        <body onload="myFunction()">
+            <table class="table table-striped table-bordered" style="width: 90%; margin-left: auto; margin-right: auto;">
+                <thead>
+                    <tr>
+                        <th scope="col" style="width: 50%">Class</th>
+                        <th scope="col" style="width: 30%">Teacher</th>
+                        <th scope="col" style="width: 20%">Grade</th>
+                    </tr>
+                </thead>
+                {% for class in classes %}
+                    <tr>
+                        <td>{{ class["class"] }}</td>
+                        <td>{{ class["teacher"] }}</td>
+                        <td style="text-decoration: underline;"><a class="grade" data-bs-toggle="modal" data-bs-target="#grades-{{ class['id'] }}">{{ display_grade[class["id"]][2] }}</a></td>
+                    </tr>
+                {% endfor %}
+            </table>
+
+            {% for class in classes %}
+                <div class="modal fade" id="grades-{{ class['id'] }}" tabindex="-1">
+                    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title w-100">Grades for {{ class["class"] }}</h4>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                {% if display_grade[class["id"]][2] != "No Grade" %}
+                                    <h4>Grade: {{ display_grade[class["id"]][2] }}</h4>
+                                    <table class="table table-striped table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Name</th>
+                                                <th scope="col">Points Earned</th>
+                                                <th scope="col">Points Possible</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for grade in grades[class["id"]] %}
+                                            <tr>
+                                                <td><a class="grade" data-bs-toggle="modal" data-bs-target="#edit-{{ grade['id'] }}">{{ grade["name"] }}</a></td>
+                                                <td>{{ grade["points_earned"]|float|round(2) }}</td>
+                                                <td>{{ grade["points_possible"]|float|round(2) }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th>TOTAL</th>
+                                                <td>{{ display_grade[class["id"]][0] }}</td>
+                                                <td>{{ display_grade[class["id"]][1] }}</td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+
+                                {% else %}
+                                    <h4>You don't have any grades for {{ class["class"] }} yet</h4>
+                                    <h6>Click "Add grade" to add your first grade</h6>
+                                {% endif %}
+                            </div>
+                            <div class="modal-footer">
+                                {% if display_grade[class["id"]] %}
+                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#delete-all-{{ class['id'] }}" style="margin-right: auto; width: 120px">Delete all</button>
+                                {% endif %}
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add-{{ class['id'] }}" style="background-color: #00645A; width: 120px">Add a grade</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add grade -->
+                <div class="modal fade" id="add-{{ class['id'] }}" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title w-100">Add a grade to {{ class["class"] }}</h4>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="/add-grade" id="add-grade-{{ class['id'] }}" name="add-grade-{{ class['id'] }}" method="post" autocomplete="off">
+                                    <input name="class_id" type="hidden" value="{{ class['id'] }}">
+                                    <input name="class" type="hidden" value="{{ class['class'] }}">
+                                    <p>
+                                        <label>Name:</label>
+                                        <input name="name" placeholder="ex. Tideman" required>
+                                    </p>
+                                    <p>
+                                        <label>Points Earned:</label>
+                                        <input type="number" name="points_earned" placeholder="ex. 17" required min="0">
+                                    </p>
+                                    <p>
+                                        <label>Total Points:</label>
+                                        <input type="number" name="points_possible" placeholder="ex. 18" required min="1">
+                                    </p>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-target="#grades-{{ class['id'] }}" data-bs-toggle="modal">Cancel</button>
+                                <button form="add-grade-{{ class['id'] }}" type="submit" class="btn btn-primary">Add</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Delete all -->
+                <div class="modal fade" id="delete-all-{{ class['id'] }}" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title w-100">Delete All Grades for {{ class['class'] }}</h4>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <strong style="text-align: center">Are you sure you want to delete all the grades for {{ class['class'] }}?</strong><br>
+                                <small>Note: This action cannot be undone.</small>
+                                <form action="/delete-all-grades" id="delete-all-grades-{{ class['id'] }}" name="delete-all-grades-{{ class['id'] }}" method="post">
+                                    <input name="class_id" type="hidden" value="{{ class['id'] }}">
+                                    <input name="class" type="hidden" value="{{ class['class'] }}">
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-target="#grades-{{ class['id'] }}" data-bs-toggle="modal">Cancel</button>
+                                <button form="delete-all-grades-{{ class['id'] }}" type="submit" class="btn btn-danger">Confirm</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+            <!-- Edit grades -->
+            {% for class in classes %}
+                {% for grade in grades[class["id"]] %}
+                    <div class="modal fade" id="edit-{{ grade['id'] }}" tabindex="-1">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4 class="modal-title w-100">Edit "{{ grade["name"] }}" from {{ class["class"] }}</h4>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="/edit-grade" id="edit-grade-{{ grade['id'] }}" name="edit-grade-{{ grade['id'] }}" method="post" autocomplete="off">
+                                        <input name="id" type="hidden" value="{{ grade['id'] }}">
+                                        <input name="class" type="hidden" value="{{ class['class'] }}">
+                                        <p>
+                                            <label>Name:</label>
+                                            <input name="name" placeholder="ex. Tideman" required value="{{ grade['name'] }}">
+                                        </p>
+                                        <p>
+                                            <label>Points Earned:</label>
+                                            <input type="number" name="points_earned" placeholder="ex. 17" required min="0" value="{{ grade['points_earned'] }}">
+                                        </p>
+                                        <p>
+                                            <label>Total Points:</label>
+                                            <input type="number" name="points_possible" placeholder="ex. 18" required min="1" value="{{ grade['points_possible'] }}">
+                                        </p>
+                                    </form>
+                                    <!-- Delete grade -->
+                                    <form action="/delete-grade" id="delete-grade-{{ grade['id'] }}" name="delete-grade-{{ grade['id'] }}" method="post">
+                                        <input name="id" type="hidden" value="{{ grade['id'] }}">
+                                        <input name="name" type="hidden" value="{{ grade['name'] }}">
+                                        <input name="class" type="hidden" value="{{ class['class'] }}">
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-danger" form="delete-grade-{{ grade['id'] }}" style="margin-right: auto">Delete</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-target="#grades-{{ class['id'] }}" data-bs-toggle="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-primary" form="edit-grade-{{ grade['id'] }}">Save</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        {% else %}
+            <h2>You don't have any classes yet</h2>
+            <h6 style="margin-bottom: 48px">Add a class in <a href="/schedule">Classes</a> to get started</h6>
+        {% endif %}
+    </body>
+
+{% endblock %}

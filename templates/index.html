@@ -1,0 +1,82 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Home
+{% endblock %}
+
+{% block main %}
+    <script>
+      function myFunction() {
+          setTimeout(hideAlert, 5000);
+      }
+      function hideAlert() {
+          const alert = bootstrap.Alert.getOrCreateInstance('#alert-message')
+          alert.close()
+      }
+    </script>
+
+    <style>
+        a {
+            color: #212529;
+        }
+        a:hover {
+            color: #00645A;
+        }
+        h1 {
+            padding-bottom: 48px;
+            margin: 0;
+        }
+        td.grade span.hidden {
+            display: inline;
+        }
+
+        td.grade:hover span.hidden {
+            display: none;
+        }
+
+        td.grade span.shown {
+            display: none;
+        }
+
+        td.grade:hover span.shown {
+            display: inline;
+        }
+    </style>
+
+    {% if get_flashed_messages() %}
+        <div class="alert alert-success alert-dismissible fade show" id="alert-message" role="alert" style="width: 35%; margin-right: auto; margin-left: auto;">
+            {{ get_flashed_messages()[0] }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endif %}
+    <h1>My Campus</h1>
+    <body onload="myFunction()">
+        {% if classes %}
+            <table class="table table-striped table-bordered" style="width: 90%; margin-left: auto; margin-right: auto;">
+                <thead>
+                    <tr>
+                        <th>Class</th>
+                        <th>Grade</th>
+                        <th>Homework</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for class in classes %}
+                    <tr>
+                        <td><a href="/schedule">{{ class['class'] }}</a></td>
+                        <td class="grade"><span class="hidden">Hover to view</span><span class="shown"><a href="/grades">{{ display_grade[class['id']] }}</a></span></td>
+                        <td><a href="/homework">{{ assignments[class['id']] }}</a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <h2>You don't have any classes yet</h2>
+            <h6>Add a class in <a href="/schedule">Classes</a> to get started</h6>
+        {% endif %}
+    </body>
+{% endblock %}
+
+
+
+

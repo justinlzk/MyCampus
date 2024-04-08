@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Log In
+{% endblock %}
+
+{% block main %}
+    <script>
+        function myFunction() {
+            setTimeout(hideAlert, 5000);
+        }
+        function hideAlert() {
+            const alert = bootstrap.Alert.getOrCreateInstance('#alert-message')
+            alert.close()
+        }
+    </script>
+    {% if get_flashed_messages() %}
+        {% if out %}
+            <div class="alert alert-success alert-dismissible fade show" id="alert-message" role="alert" style="width: 35%; margin-right: auto; margin-left: auto;">
+        {% else %}
+            <div class="alert alert-danger alert-dismissible fade show" id="alert-error" role="alert" style="width: 35%; margin-right: auto; margin-left: auto;">
+        {% endif %}
+            {{ get_flashed_messages()[0] }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endif %}
+
+    <h2 style="padding-bottom: 24px">Log In</h2>
+    <body onload="myFunction()">
+        <form action="/login" method="post">
+            <div class="mb-3">
+                <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="username" name="username" placeholder="Username" type="text">
+            </div>
+            <div class="mb-3">
+                <input class="form-control mx-auto w-auto" id="password" name="password" placeholder="Password" type="password">
+            </div>
+            <button class="btn btn-primary" style="margin: 24px" type="submit">Log In</button>
+        </form>
+    </body>
+
+{% endblock %}
