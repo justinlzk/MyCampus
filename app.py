@@ -183,7 +183,7 @@ def homework():
     classes = db.execute("SELECT id, user_id, class, teacher FROM schedules WHERE user_id = ? ORDER BY period", session["user_id"])
     homework= {}
     for c in classes:
-        homework[c['id']] = db.execute("SELECT * FROM homework WHERE user_id = ? AND class_id = ? ORDER BY due_date ASC NULLS LAST", session['user_id'], c['id'])
+        homework[c['id']] = db.execute("SELECT * FROM homework WHERE user_id = ? AND class_id = ? ORDER BY -due_date DESC", session['user_id'], c['id'])
         for h in homework[c['id']]:
             h['due_date_display'] = format_date(h['due_date'])
     return render_template("homework.html", classes=classes, homework=homework)
