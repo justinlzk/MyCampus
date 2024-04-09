@@ -5,7 +5,7 @@ from cs50 import SQL
 from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
 from tempfile import mkdtemp
-from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash 
 
 from helpers import login_required
 
@@ -236,11 +236,6 @@ def clear_homework():
     return redirect("/homework")
 
 
-
-@app.route("/about")
-def about():
-    return render_template("about.html")
-
 @app.route("/login", methods=["GET", "POST"])
 def login():
     """Log user in"""
@@ -367,7 +362,7 @@ def register():
         # Create new user by inserting into users database
         db.execute("INSERT INTO users (username, hash) VALUES(?, ?)", username, hash)
 
-        # Get session id of user that just regiestered
+        # Get session id of user that just registered
         user = db.execute("SELECT id FROM users WHERE username = ?", username)
 
         session["user_id"] = user[0]["id"]
